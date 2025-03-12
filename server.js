@@ -53,10 +53,11 @@ Ideas must be directly related to ${eventName} in ${eventLocation}, considering 
         });
 
         // ✅ Extract AI Response into an Array
-        let activities = response.data.choices[0].message.content
-            .split("\n")
-            .map(line => line.replace(/^Day \d+:\s*/, "").trim()) // Remove "Day X: " if present
-            .filter(line => line.length > 0);
+let activities = response.data.choices[0].message.content
+    .split("\n")
+    .map(line => line.replace(/^(\d+\.|\-|\•|Countdown Ideas:|Extra Fun Ideas:)\s*/, "").trim()) // Remove headers, numbers, bullets
+    .filter(line => line.length > 0); // Remove empty lines
+
 
 
         // ✅ Ensure Each Countdown Day Has an Activity
