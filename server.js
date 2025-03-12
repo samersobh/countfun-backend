@@ -30,11 +30,8 @@ app.post("/api/fetch-activities", async (req, res) => {
     try {
         // ✅ Improved AI Prompt for Better Recommendations
     const prompt = `
-    You are an enthusiastic and friendly event planner. Suggest one unique and relevant activity for each of the ${countdownDays} days leading up to the event.
-    Additionally, suggest 5 extra fun activities related to this event and location that can be done anytime.
-    - Event: ${eventName}
-    - Location: ${eventLocation}
-    - Ensure activities fit the event type and location, and they can range between expert ideas and simple ideas. 
+    You are an enthusiastic and friendly event planner. Generate a list of unique activities leading up to ${eventName} in ${eventLocation}. Do not mention day numbers or sart with "day".
+    Summarize each idea in no more than 10 words. Ensure activities are relevant to ${eventName} in ${eventLocation}.
     - Format: First, list ${countdownDays} countdown ideas. Then, list 5 extra fun ideas.
     `;
 
