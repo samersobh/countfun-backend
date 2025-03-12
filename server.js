@@ -56,8 +56,9 @@ app.post("/api/fetch-activities", async (req, res) => {
         // ✅ Extract AI Response into an Array
         let activities = response.data.choices[0].message.content
             .split("\n")
-            .map(line => line.replace(/^\d+\.\s*/, "").trim()) // Remove numbering & clean text
-            .filter(line => line.length > 0); // Remove empty lines
+            .map(line => line.replace(/^Day \d+:\s*/, "").trim()) // Remove "Day X: " if present
+            .filter(line => line.length > 0);
+
 
         // ✅ Ensure Each Countdown Day Has an Activity
         while (activities.length < countdownDays) {
