@@ -1,39 +1,47 @@
+// ✅ Import Required Packages
 const express = require("express");
 const axios = require("axios");
 const cors = require("cors");
-require("dotenv").config();
+require("dotenv").config(); // Load environment variables
 
+// ✅ Initialize Express App
 const app = express();
-app.use(express.json());
+app.use(express.json()); // Enable JSON parsing
 
-// ✅ Fix CORS to Allow Frontend Requests
+// ✅ Allow CORS for Frontend Requests (Change if needed)
 app.use(cors({
-    origin: "http://127.0.0.1:5500", // Adjust to your frontend's actual port if different
-    methods: "GET,POST,OPTIONS",
-    allowedHeaders: "Content-Type,Authorization"
+    origin: "*", // Allow requests from any frontend
+    methods: "GET, POST, OPTIONS",
+    allowedHeaders: "Content-Type, Authorization"
 }));
 
-// ✅ Handle Preflight Requests
+// ✅ Handle Preflight Requests (Fixes CORS Issues)
 app.options("/api/fetch-activities", cors());
 
 // ✅ API Route: Fetch AI-Generated Activities
 app.post("/api/fetch-activities", async (req, res) => {
     const { eventName, eventLocation, countdownDays } = req.body;
 
+    // ✅ Validate Inputs
+    if (!eventName || !eventLocation || !countdownDays) {
+        return res.status(400).json({ error: "Missing required parameters" });
+    }
+
     try {
-        // ✅ NEW IMPROVED AI PROMPT
+        // ✅ Improved AI Prompt for Better Recommendations
         const prompt = `
-        I am preparing a special event: ${eventName} in ${eventLocation}.
-        I have ${countdownDays} days to prepare. 
-        Suggest one unique, fun, and relevant activity for each day leading up to the event. 
-        The activities should fit both the event type and location. 
-        Be detailed, practical, and creative. Ensure that no activities repeat. 
-        Format the response as a numbered list with each day's idea.`;
+        You are an expert event planner. Suggest one unique and relevant activity for each of the ${countdownDays} days leading up to the event.
+        - Event: ${eventName}
+        - Location: ${eventLocation}
+        - The activities should be exciting, creative, and practical.
+        - Ensure activities fit the event type and location.
+        - Format as a numbered list with a short description for each day.
+        `;
 
         const response = await axios.post("https://api.openai.com/v1/chat/completions", {
             model: "gpt-3.5-turbo",
             messages: [
-                { role: "system", content: "You are an expert event planner providing tailored event preparation ideas." },
+                { role: "system", content: "You are an expert event planner providing unique event preparation ideas." },
                 { role: "user", content: prompt }
             ],
             max_tokens: 500,
@@ -47,22 +55,23 @@ app.post("/api/fetch-activities", async (req, res) => {
 
         // ✅ Extract AI Response into an Array
         let activities = response.data.choices[0].message.content
-            .split("\n") // Split by new lines
-            .map(line => line.replace(/^\d+\.\s*/, "").trim()) // Remove numbering & trim spaces
+            .split("\n")
+            .map(line => line.replace(/^\d+\.\s*/, "").trim()) // Remove numbering & clean text
             .filter(line => line.length > 0); // Remove empty lines
 
-        // ✅ If AI returned fewer activities than needed, fill the missing ones
+        // ✅ Ensure Each Countdown Day Has an Activity
         while (activities.length < countdownDays) {
             activities.push("📝 Plan your own activity for this day!");
         }
 
         res.json({ activities });
+
     } catch (error) {
-        console.error("AI Fetch Error:", error.response ? error.response.data : error.message);
-        res.status(500).json({ error: "Failed to fetch activity ideas" });
+        console.error("❌ AI Fetch Error:", error.response ? error.response.data : error.message);
+        res.status(500).json({ error: "Failed to fetch activity ideas from OpenAI" });
     }
 });
 
-// ✅ Start Server on Correct Port
+// ✅ Start Server on Render (Use Port 5001 or Default to Environment Port)
 const PORT = process.env.PORT || 5001;
 app.listen(PORT, () => console.log(`✅ Server running on port ${PORT}`));
