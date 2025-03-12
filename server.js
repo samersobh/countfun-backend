@@ -29,14 +29,14 @@ app.post("/api/fetch-activities", async (req, res) => {
 
     try {
         // ✅ Improved AI Prompt for Better Recommendations
-        const prompt = `
-        You are an expert event planner. Suggest one unique and relevant activity for each of the ${countdownDays} days leading up to the event.
-        - Event: ${eventName}
-        - Location: ${eventLocation}
-        - The activities should be exciting, creative, and practical.
-        - Ensure activities fit the event type and location.
-        - Format as a numbered list with a short description for each day.
-        `;
+    const prompt = `
+    You are an enthusiastic and friendly event planner. Suggest one unique and relevant activity for each of the ${countdownDays} days leading up to the event.
+    Additionally, suggest 5 extra fun activities related to this event and location that can be done anytime.
+    - Event: ${eventName}
+    - Location: ${eventLocation}
+    - Ensure activities fit the event type and location, and they can range between expert ideas and simple ideas. 
+    - Format: First, list ${countdownDays} countdown ideas. Then, list 5 extra fun ideas.
+    `;
 
         const response = await axios.post("https://api.openai.com/v1/chat/completions", {
             model: "gpt-3.5-turbo",
