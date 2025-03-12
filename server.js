@@ -29,14 +29,15 @@ app.post("/api/fetch-activities", async (req, res) => {
 
     try {
         // ✅ Improved AI Prompt for Better Recommendations
-const prompt = `
-You are an enthusiastic and friendly event planner. Generate a list of creative, exciting, and event-appropriate activities leading up to ${eventName} in ${eventLocation}.
-Do NOT include numbers, bullets, or headers like 'Day X:'. 
-Each idea must be a single sentence with at most 10 words.
-Ideas must be directly related to ${eventName} in ${eventLocation}, considering the event theme and location-specific elements.
-- Instead of a numbered list, return ideas as plain text, separated by new lines.
-- Format: First, write ${countdownDays} unique countdown ideas. Then, write 5 extra fun ideas.
-`;
+
+        const prompt = `
+            You are an enthusiastic and friendly event planner. Generate a list of creative, exciting, and event-appropriate activities for ${eventName} in ${eventLocation}.
+            Do NOT include numbering, bullets, headers, introductions, or summaries.
+            Do NOT separate ideas into categories—simply list ${countdownDays + 3} unique activities as plain text.
+            Each activity must be a single sentence with at most 10 words.
+            Ideas must be directly related to ${eventName} in ${eventLocation}, considering the event theme and location-specific elements.
+            Return ideas in a simple list format, each activity on a new line.
+            `;
         const response = await axios.post("https://api.openai.com/v1/chat/completions", {
             model: "gpt-3.5-turbo",
             messages: [
